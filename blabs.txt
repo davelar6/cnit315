@@ -1,0 +1,281 @@
+//Name: Henrique Carvalho Ribeiro
+//Email: hribeiro@purdue.edu
+//TA: Minji Lee
+//Lab section: Friday, 3:30PM
+//Description: This code generates a stack and a queue and lets the user manipulate it in multiple different ways
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+struct User { //DEFINING USER STRUCT
+    char firstName[20];
+    char lastName[20];
+    int PUID;
+    int age;
+};
+
+struct Node { //DEFINING NODE STRUCT
+    struct User user;
+    struct Node* next;
+};
+
+struct User newUserWizard(){ //Function to create a user and return it
+    char firstName[20];
+    char lastName[20];
+    int PUID;
+    int age;
+    printf("Please enter the user's first name: ");
+    scanf("%s", firstName);
+    printf("Please enter the user's last name: ");
+    scanf("%s", lastName);
+    printf("Please enter the user's PUID: ");
+    scanf("%d", &PUID);
+    printf("Please enter user's the age: ");
+    scanf("%d", &age);
+                
+    struct User newUser = {0};  
+    strcpy(newUser.firstName, firstName);
+    strcpy(newUser.lastName, lastName);
+    newUser.PUID = PUID;
+    newUser.age = age;
+    
+    return newUser;
+}
+
+struct Node *queueStart = NULL; //creating empty queue
+struct Node *stackStart = NULL; //creating empty stack
+
+bool isStackEmpty(){ //function to see if stack is empty
+    if (stackStart == NULL) return 1;
+    return 0;
+}
+
+bool isQueueEmpty(){ //function to see if queue is empty
+    if (queueStart == NULL) return 1;
+    return 0;
+}
+
+void enqueue(struct User passedUser){ //function to enqueue
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->user = passedUser;
+    newNode->next = NULL;
+    
+    if (queueStart == NULL) { 
+        queueStart = newNode;
+    }
+    else {
+        struct Node* current = queueStart;
+        while (current->next != NULL){ 
+            current = current->next;
+        }
+        current->next = newNode;  
+    }
+}
+
+struct User dequeue(){ //function to dequeue
+    struct Node *dequeuedNode = queueStart;
+    queueStart = queueStart->next;
+    return (dequeuedNode->user);
+}
+
+void push(struct User passedUser){ //function to push onto stack
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->user = passedUser;
+    newNode->next = stackStart;
+    stackStart = newNode;
+}
+
+struct User pop(){  //function to pop the user
+    struct Node *poppedNode = stackStart;
+    stackStart = stackStart->next;
+    return (poppedNode->user);
+}
+
+struct User peek(){ //function do peek
+    return (stackStart->user);
+}
+
+int stackSize(){ //function to get size of stack
+    int size = 0;
+    struct Node* current = stackStart;
+    while (current != NULL){
+        current = current->next;
+        size++;
+    }
+    return size;
+}
+
+int queueSize(){ //function to get size of queue
+    int size = 0;
+    struct Node* current = queueStart;
+    while (current != NULL){
+        current = current->next;
+        size++;
+    }
+    return size;
+}
+
+void emptyStack(){ //function to dump the stack
+    struct Node* current = stackStart;
+    while (current != NULL) {
+        struct Node* temp = current;
+        current = current->next; 
+        free(temp); 
+    }
+    stackStart = NULL;  
+}
+
+void emptyQueue(){ //function to dump the queue
+    struct Node* current = queueStart;
+    while (current != NULL) {
+        struct Node* temp = current;
+        current = current->next; 
+        free(temp); 
+    }
+    queueStart = NULL;  
+}
+
+void printStack(){ //function to print the stack
+    if (stackStart == NULL){
+        printf("Stack is empty.\n");   
+    }
+    else {
+        int size = 0;
+        struct Node* current = stackStart;
+        while (current != NULL) {
+            printf("Node %d: %s, %s, %d, %d\n", size, current->user.firstName, current->user.lastName, current->user.PUID, current->user.age);
+            current = current->next; 
+            size++;
+        }
+    }
+}
+
+void printQueue(){ //function to print the queue
+    if (queueStart == NULL){
+        printf("Queue is empty.\n");   
+    }
+    else {
+        int size = 0;
+        struct Node* current = queueStart;
+        while (current != NULL) {
+            printf("Node %d: %s, %s, %d, %d\n", size, current->user.firstName, current->user.lastName, current->user.PUID, current->user.age);
+            current = current->next; 
+            size++;
+        }
+    }
+}
+
+void reverseQueue(){ //function to reverse the queue
+    for (int i = 0; i < queueSize(); i++){
+        push(dequeue());
+    }
+    for (int i = 0; i < queueSize(); i++){
+        enqueue(pop());
+    }
+}
+
+int choiceWizard(){ //function to choose options
+    int choice;
+        
+    printf("Please select your choice:\n");
+    printf("1: Pop\n");
+    printf("2: Push\n");
+    printf("3: Peek\n");
+    printf("4: Enqueue\n");
+    printf("5: Dequeue\n");
+    printf("6: Empty Queue\n");
+    printf("7: Empty Stack\n");
+    printf("8: Print Queue\n");
+    printf("9: Print Stack\n");
+    printf("10: Reverse Queue\n");
+    printf("11: Exit\n");
+    
+    scanf("%d", &choice);
+    
+    return choice;
+}
+
+
+int main() //main function
+{
+    int count = 0;
+    while(1){
+        if (count < 4){
+            printf("Adding data structure %d to the queue and stack.\n", count);
+            push(newUserWizard());
+            enqueue(newUserWizard());
+            count++;
+        }
+        switch(choiceWizard()){
+            case 1:
+                if (isStackEmpty()){
+                    printf("Can't pop, the stack is empty.\n");
+                }
+                else {
+                    struct User poppedUser = pop();
+                    printf("\nYou popped the following node:");
+                    printf("\nFirst name: %s", poppedUser.firstName);
+                    printf("\nLast name: %s", poppedUser.firstName);
+                    printf("\nPUID: %d", poppedUser.PUID);
+                    printf("\nAge: %d\n", poppedUser.age);
+                }
+            break;
+            case 2:
+                push(newUserWizard());
+            break;
+            case 3:
+                if (isStackEmpty()){
+                    printf("Nothing in here.\n");
+                }
+                else {
+                    struct User poppedUser = peek();
+                    printf("\nYou peeked the following node:");
+                    printf("\nFirst name: %s", poppedUser.firstName);
+                    printf("\nLast name: %s", poppedUser.firstName);
+                    printf("\nPUID: %d", poppedUser.PUID);
+                    printf("\nAge: %d\n", poppedUser.age);
+                }
+            break;
+            case 4:
+                enqueue(newUserWizard());
+            break;
+            case 5:
+                if (isQueueEmpty()){
+                    printf("Can't dequeue, the queue is empty.\n");
+                }
+                else {
+                    struct User poppedUser = dequeue();
+                    printf("\nYou dequeued the following node:");
+                    printf("\nFirst name: %s", poppedUser.firstName);
+                    printf("\nLast name: %s", poppedUser.firstName);
+                    printf("\nPUID: %d", poppedUser.PUID);
+                    printf("\nAge: %d\n", poppedUser.age);
+                }
+            break;
+            case 6:
+                emptyQueue();
+            break;
+            case 7:
+                emptyStack();
+            break;
+            case 8:
+                printQueue();
+            break;
+            case 9:
+                printStack();
+            break;
+            case 10:
+                printStack();
+            break;
+            case 11:
+                exit(0);
+            break;
+        }   
+    }
+
+    return 0;
+}
+
+
